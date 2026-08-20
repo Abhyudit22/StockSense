@@ -10,7 +10,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from app.models.schema import Base, Ticker, RawItem, SentimentScore, TickerDailySentiment
 
-DATABASE_URL = "postgresql+asyncpg://user:password@localhost:5432/stock_platform"
+from app.core.config import settings`nDATABASE_URL = settings.DATABASE_URL
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 async_session = sessionmaker(
