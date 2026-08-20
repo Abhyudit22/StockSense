@@ -7,6 +7,11 @@ logger = logging.getLogger(__name__)
 class SentimentEngine:
     def __init__(self):
         # Fallback lexicon model is much faster on CPU
+        import nltk
+        try:
+            nltk.data.find('sentiment/vader_lexicon.zip')
+        except LookupError:
+            nltk.download('vader_lexicon')
         self.vader = SentimentIntensityAnalyzer()
         
     def score_batch(self, texts: List[str]) -> List[Dict[str, Any]]:
