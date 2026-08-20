@@ -10,7 +10,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from app.models.schema import Base, Ticker, RawItem, SentimentScore, TickerDailySentiment
 
-from app.core.config import settings`nDATABASE_URL = settings.DATABASE_URL
+from app.core.config import settings
+DATABASE_URL = settings.DATABASE_URL
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 async_session = sessionmaker(
