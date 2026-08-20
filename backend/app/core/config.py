@@ -10,4 +10,4 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file="../.env", extra="ignore")
 
-settings = Settings()
+settings = Settings()`nif settings.DATABASE_URL.startswith("postgresql://"):`n    settings.DATABASE_URL = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
