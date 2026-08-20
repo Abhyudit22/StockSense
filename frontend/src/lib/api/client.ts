@@ -1,4 +1,6 @@
-export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+let _base = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+if (_base && !_base.endsWith('/api')) { _base = _base.replace(/\/$/, '') + '/api'; }
+export const API_BASE = _base;
 
 export async function getSentiment(symbol: string, customFetch: typeof fetch = fetch) {
     const res = await customFetch(`${API_BASE}/tickers/${symbol}/sentiment`);
