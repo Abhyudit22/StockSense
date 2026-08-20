@@ -7,6 +7,8 @@ class Ticker(Base):
     id = Column(Integer, primary_key=True, index=True)
     symbol = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
+    company_name = Column(String, nullable=True)
+    tracked_since = Column(DateTime(timezone=True), server_default=func.now())
 
 class RawItem(Base):
     __tablename__ = "raw_items"
@@ -30,7 +32,7 @@ class TickerDailySentiment(Base):
     __tablename__ = "ticker_daily_sentiment"
     id = Column(Integer, primary_key=True, index=True)
     ticker_id = Column(Integer, ForeignKey("tickers.id"), nullable=False)
-    date = Column(DateTime, nullable=False)
+    date = Column(DateTime(timezone=True), nullable=False)
     aggregate_score = Column(Float, nullable=False)
     volume = Column(Integer, nullable=False)
     confidence = Column(Float)
@@ -40,7 +42,7 @@ class IPOFiling(Base):
     id = Column(Integer, primary_key=True, index=True)
     company_name = Column(String, nullable=False)
     ticker = Column(String, nullable=False)
-    filing_date = Column(DateTime, nullable=False)
+    filing_date = Column(DateTime(timezone=True), nullable=False)
     s1_url = Column(String, nullable=False)
 
 class IPOReport(Base):
