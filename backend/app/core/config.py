@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str
     OPENROUTER_API_KEY: Optional[str] = None
 
-    model_config = SettingsConfigDict(env_file="../.env", extra="ignore")
+    model_config = SettingsConfigDict(env_file='../.env', extra='ignore')
 
-settings = Settings()`nif settings.DATABASE_URL.startswith("postgresql://"):`n    settings.DATABASE_URL = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+settings = Settings()
+if settings.DATABASE_URL.startswith('postgresql://'):
+    settings.DATABASE_URL = settings.DATABASE_URL.replace('postgresql://', 'postgresql+asyncpg://', 1)
