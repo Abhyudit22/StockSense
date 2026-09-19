@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
+    import { API_BASE } from "$lib/api/client";
 
     let fname = $state("");
     let lname = $state("");
@@ -13,7 +14,7 @@
         errorMsg = "";
         isLoading = true;
         try {
-            const res = await fetch("http://localhost:8000/api/auth/signup", {
+            const res = await fetch(`${API_BASE}/auth/signup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ first_name: fname, last_name: lname, email, password })
