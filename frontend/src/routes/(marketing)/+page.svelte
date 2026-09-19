@@ -3,6 +3,7 @@
 
     // Fake ticker data for the landing page
         import { intersect } from "$lib/actions/intersect";
+    import { spotlight } from "$lib/actions/spotlight";
     
     let section1Visible = $state(false);
     let section2Visible = $state(false);
@@ -203,6 +204,7 @@
 
                 <!-- Central glowing orb -->
                 <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl animate-pulse element-3d" style="transform: translateZ(-50px);"></div>
+                </div>
             </div>
         </div>
 
@@ -238,7 +240,15 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 fade-in-up" use:intersect={{ onEnter: () => section2Visible = true }} class:visible={section2Visible}>
             <!-- Fake Graph Card 1 -->
-            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-8 backdrop-blur-sm hover:border-emerald-500/30 transition-colors">
+            <div class="spotlight-card group relative bg-zinc-900/40 border border-white/5 rounded-2xl p-8 backdrop-blur-sm transition-colors overflow-hidden" use:spotlight>
+                <!-- Spotlight Hover Effect -->
+                <div class="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-300 group-hover:opacity-100" 
+                     style="background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(16, 185, 129, 0.15), transparent 40%); z-index: 0;">
+                </div>
+                <div class="pointer-events-none absolute -inset-px rounded-2xl border border-emerald-500/50 opacity-0 transition duration-300 group-hover:opacity-100" 
+                     style="mask-image: radial-gradient(300px circle at var(--mouse-x) var(--mouse-y), black, transparent); -webkit-mask-image: radial-gradient(300px circle at var(--mouse-x) var(--mouse-y), black, transparent); z-index: 0;">
+                </div>
+                <div class="relative z-10">
                 <h3 class="text-xl font-bold mb-2">Live Sentiment Index</h3>
                 <p class="text-sm text-zinc-500 mb-6">Real-time bullish/bearish divergence across multiple timeframes.</p>
                 <div class="h-48 flex items-end gap-2">
@@ -248,10 +258,19 @@
                         </div>
                     {/each}
                 </div>
+                </div>
             </div>
 
             <!-- Fake Graph Card 2 -->
-            <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-8 backdrop-blur-sm hover:border-emerald-500/30 transition-colors">
+            <div class="spotlight-card group relative bg-zinc-900/40 border border-white/5 rounded-2xl p-8 backdrop-blur-sm transition-colors overflow-hidden" use:spotlight>
+                <!-- Spotlight Hover Effect -->
+                <div class="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-300 group-hover:opacity-100" 
+                     style="background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(16, 185, 129, 0.15), transparent 40%); z-index: 0;">
+                </div>
+                <div class="pointer-events-none absolute -inset-px rounded-2xl border border-emerald-500/50 opacity-0 transition duration-300 group-hover:opacity-100" 
+                     style="mask-image: radial-gradient(300px circle at var(--mouse-x) var(--mouse-y), black, transparent); -webkit-mask-image: radial-gradient(300px circle at var(--mouse-x) var(--mouse-y), black, transparent); z-index: 0;">
+                </div>
+                <div class="relative z-10">
                 <h3 class="text-xl font-bold mb-2">Volume Analysis</h3>
                 <p class="text-sm text-zinc-500 mb-6">Identify institutional accumulation phases before retail breakdown.</p>
                 <div class="h-48 relative overflow-hidden flex flex-col justify-end gap-2">
@@ -262,6 +281,7 @@
                     {#each Array(15) as _, i}
                         <div class="w-full bg-zinc-800/50 h-px"></div>
                     {/each}
+                </div>
                 </div>
             </div>
         </div>
