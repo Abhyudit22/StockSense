@@ -1,0 +1,34 @@
+services:
+  # 1. PostgreSQL Database
+  - type: pgo
+    name: stocksense-db
+    plan: free
+
+  # 2. Redis Cache
+  - type: redis
+    name: stocksense-redis
+    plan: free
+    ipAllowList: [] # Allow internal connections
+
+  # 3. FastAPI Backend Web Service
+  - type: web
+    name: stocksense-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: stocksense-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: stocksense-redis
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "http://localhost:5173,https://stock-sense-six-brown.vercel.app" # Update this to your live Vercel URL
