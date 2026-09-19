@@ -1,9 +1,9 @@
-services:
+databases:
   # 1. PostgreSQL Database
-  - type: pgo
-    name: stocksense-db
+  - name: stocksense-db
     plan: free
 
+services:
   # 2. Redis Cache
   - type: redis
     name: stocksense-redis
