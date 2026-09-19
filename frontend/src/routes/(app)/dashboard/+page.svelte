@@ -72,24 +72,63 @@
 
 <div class="space-y-6">
 
+    <!-- ═══════ SEARCH HUB ═══════ -->
+    <div class="bg-gradient-to-r from-zinc-900 to-zinc-900/50 border border-zinc-800 rounded-2xl p-8 mb-8 text-center">
+        <h2 class="text-3xl font-bold text-white mb-3">What are you looking for?</h2>
+        <p class="text-zinc-400 mb-6 max-w-lg mx-auto">Search for any NSE or BSE stock to instantly view its live TradingView chart, AI sentiment analysis, and social mentions.</p>
+        
+        <form onsubmit={handleSearch} class="relative max-w-2xl mx-auto">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-xl">search</span>
+            <input
+                type="text"
+                bind:value={searchInput}
+                placeholder="Search symbol (e.g., RELIANCE, TCS)..."
+                class="w-full bg-zinc-950 border border-zinc-700 rounded-2xl py-4 pl-12 pr-4 text-lg text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all uppercase shadow-xl"
+            />
+            <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold px-6 py-2 rounded-xl transition-colors">
+                Analyze
+            </button>
+        </form>
+    </div>
+
+    <!-- ═══════ TRENDING STOCKS GRID ═══════ -->
+    <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-amber-500">local_fire_department</span>
+        Trending Stocks
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        {#each (data.tickers || []).slice(0, 8) as t}
+            <a href={`/ticker/${t.symbol}`} class="bg-zinc-900 border border-zinc-800 hover:border-zinc-600 rounded-2xl p-5 transition-all group hover:scale-[1.02]">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h4 class="font-bold text-white text-lg">{t.symbol}</h4>
+                        <p class="text-xs text-zinc-500 line-clamp-1">{t.name || t.company_name}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-mono text-white text-sm">₹{t.price ? t.price.toFixed(2) : '---'}</p>
+                        <p class="font-mono text-xs font-medium {t.change_percent >= 0 ? 'text-emerald-400' : 'text-red-400'}">
+                            {t.change_percent > 0 ? '+' : ''}{t.change_percent ? t.change_percent.toFixed(2) : '0'}%
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-zinc-500">Mentions: {t.volume}</span>
+                    <span class="font-bold px-2 py-1 rounded {t.current_score > 0.1 ? 'bg-emerald-500/20 text-emerald-400' : (t.current_score < -0.1 ? 'bg-red-500/20 text-red-400' : 'bg-zinc-800 text-zinc-400')}">
+                        {t.current_score > 0 ? '+' : ''}{t.current_score.toFixed(2)}
+                    </span>
+                </div>
+            </a>
+        {/each}
+    </div>
+
     <!-- ═══════ MARKET INDICES BAR ═══════ -->
     <div class="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-5">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
-                <h1 class="text-2xl font-bold text-white">StockSense</h1>
-                <p class="text-zinc-500 text-xs mt-0.5">India Market Intelligence · NSE/BSE · {marketDate}</p>
+                <p class="text-zinc-500 text-xs mt-0.5">NSE/BSE · {marketDate}</p>
             </div>
             <div class="flex items-center gap-3">
                 <span class="font-mono text-zinc-300 text-sm">{marketTime} IST</span>
-                <form onsubmit={handleSearch} class="relative">
-                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">search</span>
-                    <input
-                        type="text"
-                        bind:value={searchInput}
-                        placeholder="Search NSE symbol..."
-                        class="bg-zinc-800 border border-zinc-700 rounded-xl py-2 pl-9 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all uppercase w-52"
-                    />
-                </form>
             </div>
         </div>
 

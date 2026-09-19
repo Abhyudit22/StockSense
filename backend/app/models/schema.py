@@ -2,6 +2,15 @@ from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Tex
 from sqlalchemy.sql import func
 from app.db.base import Base
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    first_name = Column(String, nullable=True)
+    last_name = Column(String, nullable=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
 class Ticker(Base):
     __tablename__ = "tickers"
     id = Column(Integer, primary_key=True, index=True)
@@ -61,3 +70,28 @@ class AgentEvent(Base):
     step_name = Column(String, nullable=False)
     message = Column(Text, nullable=False)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
+
+class Portfolio(Base):
+    __tablename__ = "portfolios"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    cash_balance = Column(Float, default=1000000.0, nullable=False) # Start with 10 Lakhs INR
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class PortfolioPosition(Base):
+    __tablename__ = "portfolio_positions"
+    id = Column(Integer, primary_key=True, index=True)
+    portfolio_id = Column(Integer, ForeignKey("portfolios.id"), nullable=False)
+    ticker_id = Column(Integer, ForeignKey("tickers.id"), nullable=False)
+    shares = Column(Integer, default=0, nullable=False)
+    average_price = Column(Float, nullable=False)
+
+class PortfolioTransaction(Base):
+    __tablename__ = "portfolio_transactions"
+    id = Column(Integer, primary_key=True, index=True)
+    portfolio_id = Column(Integer, ForeignKey("portfolios.id"), nullable=False)
+    ticker_id = Column(Integer, ForeignKey("tickers.id"), nullable=False)
+    shares = Column(Integer, nullable=False)
+    price_at_execution = Column(Float, nullable=False)
+    transaction_type = Column(String, nullable=False) # 'BUY' or 'SELL'
+    executed_at = Column(DateTime(timezone=True), server_default=func.now())

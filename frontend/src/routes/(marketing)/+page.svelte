@@ -204,7 +204,6 @@
 
                 <!-- Central glowing orb -->
                 <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl animate-pulse element-3d" style="transform: translateZ(-50px);"></div>
-                </div>
             </div>
         </div>
 

@@ -32,6 +32,34 @@
                 }
             }, 3000);
         }
+
+        // Load TradingView Widget
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = 'https://s3.tradingview.com/tv.js';
+        script.async = true;
+        script.onload = () => {
+            if (typeof (window as any).TradingView !== 'undefined') {
+                new (window as any).TradingView.widget({
+                    "autosize": true,
+                    "symbol": `BSE:${sentiment.symbol}`, // Using BSE prefix as it's Indian stocks
+                    "interval": "D",
+                    "timezone": "Asia/Kolkata",
+                    "theme": "dark",
+                    "style": "1",
+                    "locale": "in",
+                    "enable_publishing": false,
+                    "backgroundColor": "rgba(24, 24, 27, 1)",
+                    "gridColor": "rgba(39, 39, 42, 1)",
+                    "hide_top_toolbar": false,
+                    "hide_legend": false,
+                    "save_image": false,
+                    "container_id": `tradingview_${sentiment.symbol}`,
+                    "support_host": "https://www.tradingview.com"
+                });
+            }
+        };
+        document.getElementById(`tradingview_${sentiment.symbol}`)?.appendChild(script);
     });
 
     onDestroy(() => {
@@ -122,10 +150,14 @@
                 </div>
             </div>
 
-            <!-- Trend Chart -->
-            <div class="card p-5">
-                <h3 class="text-sm font-medium text-white mb-6">30-Day Stock Price Trend</h3>
-                <TrendChart data={sentiment.trend_30_days} />
+            <!-- TradingView Advanced Chart -->
+            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden p-1 relative" style="height: 600px;">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container" style="height:100%;width:100%">
+                    <div id="tradingview_{sentiment.symbol}" style="height:calc(100% - 32px);width:100%"></div>
+                    <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
+                </div>
+                <!-- TradingView Widget END -->
             </div>
 
             <!-- Source Ledger -->
@@ -135,8 +167,64 @@
         </div>
 
         <!-- Sidebar -->
-        <div class="card overflow-hidden h-[600px] xl:sticky xl:top-20">
-            <AgentActivityPanel targetTickerId={null} />
+        <div class="space-y-6">
+            <!-- Paper Trading Widget -->
+            <div class="card p-5 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-blue-400">account_balance_wallet</span>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Paper Trade Simulator</h3>
+                </div>
+                
+                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 mb-4 text-center">
+                    <p class="text-xs text-zinc-500 mb-1">Current Mock Price</p>
+                    <p class="text-2xl font-mono font-bold text-white">₹{sentiment.trend_30_days?.length ? sentiment.trend_30_days[sentiment.trend_30_days.length-1].score.toFixed(2) : '---'}</p>
+                </div>
+                
+                <form class="space-y-4" onsubmit={async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target as HTMLFormElement);
+                    const action = e.submitter?.getAttribute("value"); // BUY or SELL
+                    const shares = parseInt(formData.get("shares") as string);
+                    const price = sentiment.trend_30_days?.length ? sentiment.trend_30_days[sentiment.trend_30_days.length-1].score : 0;
+                    
+                    if (shares > 0 && price > 0 && action) {
+                        try {
+                            const res = await fetch('http://localhost:8000/api/portfolio/trade', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                },
+                                body: JSON.stringify({
+                                    symbol: sentiment.symbol,
+                                    shares,
+                                    price,
+                                    transaction_type: action
+                                })
+                            });
+                            if (res.ok) alert(`Paper Trade: ${action} ${shares} shares successful!`);
+                            else alert("Trade failed. Check balance or holding.");
+                        } catch(err) {
+                            alert("Network error.");
+                        }
+                    }
+                }}>
+                    <div>
+                        <label for="shares" class="block text-xs font-semibold text-zinc-400 mb-1">Quantity (Shares)</label>
+                        <input type="number" id="shares" name="shares" min="1" required class="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2 px-3 text-white focus:outline-none focus:border-blue-500" placeholder="10">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="submit" name="action" value="BUY" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 font-bold py-2 rounded-lg transition-colors">BUY</button>
+                        <button type="submit" name="action" value="SELL" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 font-bold py-2 rounded-lg transition-colors">SELL</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Agent Activity -->
+            <div class="card overflow-hidden h-[400px]">
+                <AgentActivityPanel targetTickerId={null} />
+            </div>
         </div>
     </div>
 </div>

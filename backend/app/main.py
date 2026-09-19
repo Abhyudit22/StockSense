@@ -1,10 +1,16 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from app.core.rate_limit import limiter
 from app.api.sentiment import router as sentiment_router
 from app.api.ws import router as ws_router
 from app.api.analytics import router as analytics_router
 from app.api.dashboard import router as dashboard_router
+from app.api.auth import router as auth_router
+from app.api.portfolio import router as portfolio_router
+from app.api.screener import router as screener_router
 from app.core.config import settings
 from app.workers.scheduler import start_scheduler, scheduler
 
@@ -17,7 +23,9 @@ async def lifespan(app: FastAPI):
     if scheduler.running:
         scheduler.shutdown(wait=False)
 
-app = FastAPI(title="Stock Sentiment API", lifespan=lifespan)
+app = FastAPI(title="StockSense API", lifespan=lifespan)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,11 +35,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(sentiment_router)
 app.include_router(ws_router)
 app.include_router(analytics_router)
 app.include_router(dashboard_router)
+app.include_router(portfolio_router)
+app.include_router(screener_router)
 
 @app.get("/health")
-async def health():
+@limiter.limit("5/minute")
+async def health(request: Request):
     return {"status": "ok"}
